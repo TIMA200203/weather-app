@@ -1,0 +1,21 @@
+{% extends 'base.html' %}  
+
+{% block title %}Нагадування про погоду - Головна{% endblock %}  
+
+{% block content %}  
+
+<div class="container mt-5">  
+    <div class="row justify-content-center">  
+        <div class="col-md-10">  
+            <div class="jumbotron jumbotron-fluid bg-info text-white">  
+                <div class="container text-center">  
+                    <h1 class="display-4">Ласкаво просимо до "Нагадування про погоду"</h1>  
+                    <p class="lead">Перевіряйте погоду в різних містах і плануйте свій день відповідно.</p>  
+                    <a href="{% url 'subscription:create' %}" id="create-subscription" class="btn btn-primary btn-lg">Створити підписку</a>  
+                </div>  
+            </div>  
+        </div>  
+    </div>  
+</div>  
+
+{% endblock %}  

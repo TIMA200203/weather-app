@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+    <div class="auth-container">
+        <div class="auth-form">
+            <h2 class="text-center">Login</h2>
+            <form action="{% url 'auth_api:login' %}" method="POST" id="loginForm">
+                {% csrf_token %}
+                <div id="error-message" class="alert alert-danger d-none"></div>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/auth/login.js' %}"></script>
+{% endblock %}

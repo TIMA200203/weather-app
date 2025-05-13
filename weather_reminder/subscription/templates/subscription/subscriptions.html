@@ -1,0 +1,12 @@
+{% extends 'base.html' %}  
+{% load static %}  
+
+{% block title %}Мої підписки{% endblock %}  
+
+{% block content %}  
+<a href="{% url 'subscription_api:list' user.username %}" id="subscription-list" style="display: none"></a>  
+
+    <div id="subscription-container" class="row text-center"></div>  
+
+    <script src="{% static 'js/subscriptions/subscription_list.js' %}"></script>  
+{% endblock %}  

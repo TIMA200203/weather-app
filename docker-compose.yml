@@ -1,0 +1,107 @@
+services:
+  weather-reminder:
+    build: .
+    user: ${CURRENT_UID}
+    container_name: weather_reminder_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./weather_reminder:/weather_reminder
+    env_file:
+      - .env.docker
+    command: [
+      "sh", "-c", "python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    ]
+    depends_on:
+      - redis
+      - database
+    networks:
+      - mynetwork
+
+  database:
+    image: postgres:16.2
+    container_name: postgres_weather_reminder
+    env_file:
+      - .env.docker
+    environment:
+      - DB_HOST=postgres_weather_reminder
+      - POSTGRES_DB=weather_reminder
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - mynetwork
+
+  redis:
+    image: redis:7.2.4
+    container_name: redis_weather_reminder
+    volumes:
+      - redis-db-volume:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
+
+  celery-worker:
+    build: .
+    user: ${CURRENT_UID}
+    container_name: celery_worker
+    env_file:
+      - .env.docker
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./weather_reminder:/weather_reminder
+    depends_on:
+      - weather-reminder
+      - redis
+      - celery-beat
+    networks:
+      - mynetwork
+
+  celery-beat:
+    build: .
+    user: ${CURRENT_UID}
+    container_name: celery_beat
+    environment:
+      - BROKER_CONNECTION_RETRY_ON_STARTUP=True
+    env_file:
+      - .env.docker
+    command: celery -A core beat --loglevel=info --scheduler redbeat.schedulers.RedBeatScheduler
+    volumes:
+      - ./weather_reminder:/weather_reminder
+    depends_on:
+      - redis
+      - weather-reminder
+    networks:
+      - mynetwork
+
+  flower:
+    build: .
+    user: ${CURRENT_UID}
+    container_name: flower
+    env_file:
+      - .env.docker
+    command: sh -c "celery -A core flower --address=0.0.0.0 --port=5555"
+    volumes:
+      - ./weather_reminder:/weather_reminder
+    depends_on:
+      - celery-worker
+      - celery-beat
+      - redis
+    ports:
+      - "5555:5555"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    external: True
+    name: mynetwork
+
+volumes:
+  postgres-db-volume:
+  redis-db-volume:

@@ -1,0 +1,13 @@
+{% autoescape off %}  
+Нагадування про погоду  
+
+Ось дані про погоду для {{ city }}:  
+
+Дата і час: {{ dt_txt }}  
+Температура: {{ main.temp }}°C  
+Відчувається як: {{ main.feels_like }}°C  
+Опис погоди: {{ weather_description }}  
+Швидкість вітру: {{ wind_speed }} м/с  
+Вологість: {{ humidity }}%  
+Хмарність: {{ cloudiness }}%  
+{% endautoescape %}  
